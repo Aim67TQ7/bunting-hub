@@ -1,48 +1,63 @@
 import { useAppItems } from '@/hooks/useAppItems';
 import { AppCard } from './AppCard';
-import { Grid, Loader2 } from 'lucide-react';
+import { Grid, FileText } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export function AppCardGrid() {
-  const { data: apps, isLoading, error } = useAppItems();
+interface AppCardGridProps {
+  filterCategory?: string;
+  title?: string;
+}
+
+export function AppCardGrid({ filterCategory, title = 'Applications' }: AppCardGridProps) {
+  const { data: allApps, isLoading, error } = useAppItems();
+
+  // Filter apps by category if specified
+  const apps = allApps?.filter(app => {
+    if (filterCategory) {
+      return app.category === filterCategory;
+    }
+    // Default: show non-report apps
+    return app.category !== 'report';
+  });
+
+  const Icon = filterCategory === 'report' ? FileText : Grid;
 
   return (
-    <div className="glass-panel rounded-2xl p-6">
-      <div className="flex items-center gap-2 mb-6">
-        <Grid className="h-5 w-5 text-[hsl(var(--accent-glow))]" />
-        <h2 className="text-lg font-semibold text-white">Applications</h2>
+    <div className="glass-panel rounded-2xl p-4 sm:p-5">
+      <div className="flex items-center gap-2 mb-4">
+        <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-[hsl(var(--accent-glow))]" />
+        <h2 className="text-base sm:text-lg font-semibold text-white">{title}</h2>
         {apps && (
-          <span className="text-sm text-white/40 ml-2">
+          <span className="text-xs sm:text-sm text-white/40 ml-2">
             {apps.length} available
           </span>
         )}
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="glass-card p-6">
-              <Skeleton className="w-16 h-16 rounded-xl bg-white/10 mb-4" />
-              <Skeleton className="h-6 w-3/4 bg-white/10 mb-2" />
-              <Skeleton className="h-4 w-full bg-white/10 mb-1" />
-              <Skeleton className="h-4 w-2/3 bg-white/10" />
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="glass-card p-3 sm:p-4">
+              <Skeleton className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-white/10 mb-2 sm:mb-3" />
+              <Skeleton className="h-4 sm:h-5 w-3/4 bg-white/10 mb-1.5" />
+              <Skeleton className="h-3 sm:h-4 w-full bg-white/10" />
             </div>
           ))}
         </div>
       ) : error ? (
-        <div className="text-center py-12 text-white/40">
-          <p>Failed to load applications</p>
+        <div className="text-center py-8 text-white/40">
+          <p className="text-sm">Failed to load {title.toLowerCase()}</p>
         </div>
       ) : apps && apps.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           {apps.map((app) => (
-            <AppCard key={app.id} app={app} />
+            <AppCard key={app.id} app={app} compact />
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 text-white/40">
-          <Grid className="h-12 w-12 mx-auto mb-3 opacity-50" />
-          <p>No applications available</p>
+        <div className="text-center py-8 text-white/40">
+          <Icon className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <p className="text-sm">No {title.toLowerCase()} available</p>
         </div>
       )}
     </div>

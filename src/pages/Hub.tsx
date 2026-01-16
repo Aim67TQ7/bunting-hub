@@ -37,8 +37,11 @@ export default function Hub() {
               <ActivityFeed />
             </div>
 
-            {/* App Cards Grid - Bottom Half */}
-            <AppCardGrid />
+            {/* Split Bottom: Applications & Reports */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              <AppCardGrid />
+              <AppCardGrid filterCategory="report" title="Reports" />
+            </div>
           </div>
         </main>
       </div>
