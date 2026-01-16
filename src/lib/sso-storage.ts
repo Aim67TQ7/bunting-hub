@@ -76,7 +76,7 @@ export const ssoStorage = {
  * Get the login redirect URL
  */
 export function getLoginUrl(redirectBack: boolean = true): string {
-  const loginBase = 'https://login.buntinggpt.com';
+  const loginBase = 'https://auth.buntinggpt.com';
   
   if (redirectBack) {
     const currentUrl = window.location.href;
