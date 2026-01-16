@@ -25,15 +25,15 @@ export default function Hub() {
 
   return (
     <HubLayout>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-[100dvh] flex flex-col">
         {/* Header with logo */}
         <HubHeader />
 
         {/* Main content */}
-        <main className="flex-1 px-4 sm:px-6 lg:px-8 pb-8">
-          <div className="max-w-7xl mx-auto space-y-6">
+        <main className="flex-1 px-3 sm:px-6 lg:px-8 pb-6 sm:pb-8">
+          <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
             {/* Activity Feed - Top Half */}
-            <div className="h-[300px] sm:h-[350px]">
+            <div className="h-[250px] sm:h-[300px] lg:h-[350px]">
               <ActivityFeed />
             </div>
 
