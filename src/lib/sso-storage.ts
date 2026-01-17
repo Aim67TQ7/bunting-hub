@@ -1,4 +1,4 @@
-h/**
+/**
  * Custom storage adapter for cross-subdomain SSO
  * Reads auth tokens from the parent domain cookie set by auth.buntinggpt.com
  */
