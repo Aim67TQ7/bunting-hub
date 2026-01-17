@@ -1,6 +1,6 @@
-/**
+h/**
  * Custom storage adapter for cross-subdomain SSO
- * Reads auth tokens from the parent domain cookie set by login.buntinggpt.com
+ * Reads auth tokens from the parent domain cookie set by auth.buntinggpt.com
  */
 
 const SSO_COOKIE_NAME = 'sb-auth-token';
