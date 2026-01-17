@@ -7,13 +7,13 @@ import { logLogin } from '@/lib/activity-logger';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function Hub() {
-  const { session } = useAuth();
+  const { user } = useAuth();
 
-  // Log login on first load if we have a session
+  // Log login on first load if we have a user
   useEffect(() => {
-    if (session) {
+    if (user) {
       // Only log if this looks like a fresh session
-      const lastLoginKey = `last-login-${session.user.id}`;
+      const lastLoginKey = `last-login-${user.id}`;
       const lastLogin = sessionStorage.getItem(lastLoginKey);
       
       if (!lastLogin) {
@@ -21,7 +21,7 @@ export default function Hub() {
         sessionStorage.setItem(lastLoginKey, new Date().toISOString());
       }
     }
-  }, [session]);
+  }, [user]);
 
   return (
     <HubLayout>
