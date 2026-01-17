@@ -1,1 +1,10 @@
 project_id = "qzwxisdfwswsrbzvpzlo"
+
+[functions.set-auth-cookie]
+verify_jwt = false
+
+[functions.get-session]
+verify_jwt = false
+
+[functions.clear-auth-cookie]
+verify_jwt = false

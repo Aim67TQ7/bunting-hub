@@ -8,14 +8,14 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { session, loading } = useAuth();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    // In production, redirect to login if no session
-    if (!loading && !session && !isDevelopment()) {
+    // In production, redirect to login if no user
+    if (!loading && !user && !isDevelopment()) {
       window.location.href = getLoginUrl(true);
     }
-  }, [session, loading]);
+  }, [user, loading]);
 
   // Show loading state
   if (loading) {
@@ -30,13 +30,13 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   // In development, allow access without auth for testing
-  if (isDevelopment() && !session) {
+  if (isDevelopment() && !user) {
     console.warn('Development mode: Allowing access without authentication');
     return <>{children}</>;
   }
 
-  // No session and not in dev mode - will redirect
-  if (!session) {
+  // No user and not in dev mode - will redirect
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-hub-gradient">
         <div className="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4">
