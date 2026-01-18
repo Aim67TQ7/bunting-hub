@@ -6,12 +6,14 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
   isLoading: true,
+  signOut: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -56,5 +58,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  return <AuthContext.Provider value={{ user, session, isLoading }}>{children}</AuthContext.Provider>;
+  const signOut = async () => {
+    console.log("[Hub Auth] Signing out...");
+    await supabase.auth.signOut();
+  };
+
+  return <AuthContext.Provider value={{ user, session, isLoading, signOut }}>{children}</AuthContext.Provider>;
 };
