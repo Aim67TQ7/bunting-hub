@@ -3,8 +3,9 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
 const SUPABASE_URL = "https://qzwxisdfwswsrbzvpzlo.supabase.co";
-const SUPABASE_ANON_KEY =
+const SUPABASE_PUBLISHABLE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6d3hpc2Rmd3N3c3JienZwemxvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg1OTg2NjYsImV4cCI6MjA1NDE3NDY2Nn0.nVV1d-_BfhfVNOSiusg8zSuvPwS4dSB-cJAMGVjujr4";
+
 /**
  * Check if we're running on a production BuntingGPT domain
  */
@@ -35,6 +36,7 @@ const cookieStorage = {
         const [cookieKey, ...valueParts] = cookie.split("=");
         const cookieValue = valueParts.join("=");
 
+        // FIXED: Use parentheses, not backticks
         if (cookieKey.startsWith(`${key}_chunk_`)) {
           const indexStr = cookieKey.substring(`${key}_chunk_`.length);
           const index = parseInt(indexStr, 10);
@@ -71,6 +73,8 @@ const cookieStorage = {
         // CRITICAL: Cookie domain must include leading dot for subdomain sharing
         document.cookie = `${chunkKey}=${encodedChunk}; path=/; domain=.buntinggpt.com; max-age=${COOKIE_MAX_AGE}; SameSite=Lax; Secure`;
       });
+
+      console.log(`[Cookie] Set ${chunks.length} chunk(s) for ${key}`);
     } catch (e) {
       console.error("[Cookie] Write error:", e);
     }
@@ -81,6 +85,7 @@ const cookieStorage = {
       const cookies = document.cookie.split("; ");
       for (const cookie of cookies) {
         const [cookieKey] = cookie.split("=");
+        // FIXED: Use parentheses, not backticks
         if (cookieKey.startsWith(`${key}_chunk_`)) {
           // Clear cookie by setting max-age to 0
           document.cookie = `${cookieKey}=; path=/; domain=.buntinggpt.com; max-age=0`;
@@ -94,15 +99,18 @@ const cookieStorage = {
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
-
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     // Use cookies on production domains for cross-subdomain sharing
     // Fall back to localStorage for development
     storage: isProductionDomain ? cookieStorage : window.localStorage,
+    storageKey: "sb-auth-token", // CRITICAL: Must match login app
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
     flowType: "pkce",
   },
 });
+
+console.log("[Supabase Hub] Initialized with storage:", isProductionDomain ? "cookies" : "localStorage");
+console.log("[Supabase Hub] Storage key: sb-auth-token");
