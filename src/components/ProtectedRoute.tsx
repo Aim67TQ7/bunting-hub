@@ -1,9 +1,10 @@
-import { useAuth } from '@/contexts/AuthContext';
-import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useAuthState } from '@/hooks/useAuthState';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  fallback?: React.ReactNode;
 }
 
 /**
@@ -13,17 +14,24 @@ function isDevelopment(): boolean {
   return typeof window !== 'undefined' && !window.location.hostname.includes('buntinggpt.com');
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, isLoading } = useAuth();
-  const location = useLocation();
+export function ProtectedRoute({ children, fallback }: ProtectedRouteProps) {
+  const { user, loading } = useAuthState();
 
-  // CRITICAL: Show loading state while checking session to prevent premature redirects
-  if (isLoading) {
-    return (
+  useEffect(() => {
+    if (!loading && !user && !isDevelopment()) {
+      // No session - redirect to gate with return URL
+      const returnUrl = encodeURIComponent(window.location.href);
+      window.location.href = `https://gate.buntinggpt.com?returnUrl=${returnUrl}`;
+    }
+  }, [loading, user]);
+
+  // Show loading state
+  if (loading) {
+    return fallback ?? (
       <div className="min-h-screen flex items-center justify-center bg-hub-gradient">
         <div className="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Authenticating...</p>
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
@@ -35,22 +43,9 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <>{children}</>;
   }
 
-  // No user - redirect to login
+  // No user and not in dev - will redirect
   if (!user) {
-    const currentUrl = `${window.location.protocol}//${window.location.host}${location.pathname}${location.search}`;
-    const loginUrl = `https://login.buntinggpt.com?redirect=${encodeURIComponent(currentUrl)}`;
-    
-    console.log('[ProtectedRoute] No session, redirecting to:', loginUrl);
-    window.location.href = loginUrl;
-    
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-hub-gradient">
-        <div className="glass-panel p-8 rounded-2xl flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Redirecting to login...</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return <>{children}</>;
